@@ -53,6 +53,10 @@ CTID=115 MEMORY_MB=768 REGISTRATION_DISABLED=true bash crosspoint-sync.sh
 
 - Debian 12 LXC, Node.js (NodeSource apt repo)
 - `crosspoint-sync` cloned to `/opt/crosspoint-sync/app`, built with `npm ci && npm run build`
+- The CrossPoint Sync web app (upstream's `app/`, the web half only — no Tauri/Rust)
+  built with `npm ci && vite build` and served at `http://<ct-ip>:8080/app/`
+- Listens on all interfaces (`LISTEN_ADDRESS=::` in the config; upstream's default
+  outside Docker is `localhost`, which the readers can't reach)
 - Runs as a dedicated unprivileged `crosspoint` system user under a hardened systemd unit
 - SQLite database at `/opt/crosspoint-sync/data/crosspoint.db` (kept separate from the
   git checkout so updates never touch it)
@@ -69,8 +73,10 @@ update
 ```
 
 `update` does three things: `apt upgrade` for the whole container, pull the latest
-crosspoint-sync from upstream (rebuilding only if the commit actually changed), and
-restart the service. It's idempotent and safe to run anytime.
+crosspoint-sync from upstream (rebuilding server and web app only if the commit
+actually changed), and restart the service. It's idempotent and safe to run anytime.
+Settings that newer upstream versions need are added to an older config file once
+(so far `LISTEN_ADDRESS=::`); values you set yourself are left alone.
 
 ### It updates itself, too
 

@@ -154,6 +154,8 @@ else
   NEED_BUILD=1
 fi
 [ -d "$APP_DIR/dist" ] || NEED_BUILD=1
+# The web app (served at /app/) lives in app/ since upstream added it.
+[ -f "$APP_DIR/app/package.json" ] && [ ! -d "$APP_DIR/app/dist" ] && NEED_BUILD=1
 
 if [ "$NEED_BUILD" = "1" ]; then
   echo "==> Building (npm ci && npm run build)"
@@ -161,6 +163,14 @@ if [ "$NEED_BUILD" = "1" ]; then
   npm ci --no-audit --no-fund
   npm run build
   npm prune --omit=dev
+  if [ -f "$APP_DIR/app/package.json" ]; then
+    # Same steps as upstream's Dockerfile: install scripts stay on (a git
+    # dependency builds itself in one), only the web half, no Tauri/Rust.
+    # node_modules goes afterwards; only app/dist is served.
+    echo "==> Building web app (app/: npm ci && vite build)"
+    (cd "$APP_DIR/app" && npm ci --no-audit --no-fund && npx vite build)
+    rm -rf "$APP_DIR/app/node_modules"
+  fi
 fi
 
 chown -R crosspoint:crosspoint /opt/crosspoint-sync
@@ -172,9 +182,21 @@ NODE_ENV=production
 PORT=${INIT_PORT}
 DATABASE_PATH=${DATA_DIR}/crosspoint.db
 REGISTRATION_DISABLED=${INIT_REGISTRATION_DISABLED}
+LISTEN_ADDRESS=::
 EOF
   chown crosspoint:crosspoint "$ENV_FILE"
   chmod 600 "$ENV_FILE"
+fi
+
+# Upstream listens on localhost only unless LISTEN_ADDRESS says otherwise
+# (since 2026-11). Env files from older installs lack it, which leaves the
+# server unreachable from the readers, so add it once; an existing value is
+# left as the user set it.
+ENV_CHANGED=0
+if ! grep -q '^LISTEN_ADDRESS=' "$ENV_FILE"; then
+  echo "==> Adding LISTEN_ADDRESS=:: to $ENV_FILE (listen on all interfaces)"
+  echo "LISTEN_ADDRESS=::" >> "$ENV_FILE"
+  ENV_CHANGED=1
 fi
 
 # Render the unit every run and install it only when it actually differs, so
@@ -216,7 +238,7 @@ fi
 rm -f "$NEW_UNIT"
 systemctl enable --quiet "$SERVICE_NAME"
 
-if [ "$NEED_BUILD" = "1" ] || [ "${NEED_RESTART:-0}" = "1" ] || ! systemctl is-active --quiet "$SERVICE_NAME"; then
+if [ "$NEED_BUILD" = "1" ] || [ "${NEED_RESTART:-0}" = "1" ] || [ "$ENV_CHANGED" = "1" ] || ! systemctl is-active --quiet "$SERVICE_NAME"; then
   echo "==> (Re)starting $SERVICE_NAME"
   systemctl restart "$SERVICE_NAME"
 fi
