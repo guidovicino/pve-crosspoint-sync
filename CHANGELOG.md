@@ -14,6 +14,7 @@ releases: containers pick up `master` on their next `update`.
   files that lack it (then restarts).
 
 ### Added
+- **`CLAUDE.md`** (2026-11-03): working rules for this repo — `master` ships to every container, idempotency, the env file belongs to the user, testing on CT 112 before pushing.
 - **Web app** (2026-11-03): upstream's CrossPoint Sync web app (`app/`) is
   built alongside the server (`npm ci && vite build`, the same web-only steps
   as upstream's Dockerfile) and served at `/app/`. Its `node_modules` is
