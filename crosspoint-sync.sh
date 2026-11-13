@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2026 Bastian Kolb
 #
-# Installer:  https://github.com/Boisti13/pve-crosspoint-sync
+# Installer:  https://github.com/guidovicino/pve-crosspoint-sync
 # Upstream:   https://github.com/crosspoint-reader/crosspoint-sync (MIT)
 #
 # This installer is MIT licensed and vendors no upstream code. At install time
@@ -57,7 +57,7 @@ REPO_BRANCH="${REPO_BRANCH:-main}"
 # Where the container re-fetches THIS script from on every `update` run, so the
 # in-container `update` and `info` commands stay current instead of being frozen
 # at whatever shipped on the day of first install.
-INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/Boisti13/pve-crosspoint-sync/master/crosspoint-sync.sh}"
+INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/guidovicino/pve-crosspoint-sync/master/crosspoint-sync.sh}"
 
 # ---------------------------------------------------------------------------
 # UI helpers
@@ -98,7 +98,7 @@ REPO_BRANCH="${REPO_BRANCH:-main}"
 NODE_MAJOR="${NODE_MAJOR:-24}"
 INIT_PORT="${APP_PORT:-8080}"
 INIT_REGISTRATION_DISABLED="${REGISTRATION_DISABLED:-false}"
-INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/Boisti13/pve-crosspoint-sync/master/crosspoint-sync.sh}"
+INSTALLER_URL="${INSTALLER_URL:-https://raw.githubusercontent.com/guidovicino/pve-crosspoint-sync/master/crosspoint-sync.sh}"
 CACHE_INSTALLER=/opt/crosspoint-sync/installer.sh
 
 echo "==> apt-get update && upgrade"

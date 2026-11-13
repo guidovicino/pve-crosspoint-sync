@@ -21,7 +21,7 @@ bash crosspoint-sync.sh
 or as a one-liner:
 
 ```sh
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/Boisti13/pve-crosspoint-sync/master/crosspoint-sync.sh)"
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/guidovicino/pve-crosspoint-sync/master/crosspoint-sync.sh)"
 ```
 
 This auto-picks the next free container ID, creates the LXC, and installs the app.
